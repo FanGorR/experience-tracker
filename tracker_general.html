@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExperienceTracker — Portfolio & LinkedIn Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0c0a;
+    --surface: #1a1714;
+    --surface2: #242018;
+    --accent: #c8922a;
+    --accent-dim: rgba(200,146,42,0.12);
+    --cream: #e8e0d0;
+    --muted: #7a7060;
+    --border: rgba(232,224,208,0.08);
+    --blue: #4a6a9c;
+    --blue-dim: rgba(74,106,156,0.12);
+    --green: #4a7c59;
+    --green-dim: rgba(74,124,89,0.12);
+    --resume: #7c4a8c;
+    --resume-dim: rgba(124,74,140,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* TOPBAR */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .brand-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--cream);
+  }
+
+  .brand-name span { color: var(--accent); }
+
+  .brand-sub {
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .stats {
+    display: flex;
+    gap: 1.5rem;
+    text-align: right;
+  }
+
+  .stat-item { display: flex; flex-direction: column; gap: 0.15rem; align-items: flex-end; }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.55rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* LAYOUT */
+  .layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 60px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface);
+    border-right: 0.5px solid var(--border);
+    padding: 1.5rem 0;
+    position: sticky;
+    top: 60px;
+    height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 0 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-label {
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    padding: 0 0.25rem;
+  }
+
+  .nav-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    border-radius: 3px;
+    margin-bottom: 0.15rem;
+  }
+
+  .nav-btn:hover { color: var(--cream); background: rgba(232,224,208,0.04); }
+
+  .nav-btn.active { color: var(--accent); background: var(--accent-dim); }
+
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  .sidebar-divider {
+    border: none;
+    border-top: 0.5px solid var(--border);
+    margin: 1rem 1.25rem;
+  }
+
+  .sidebar-actions {
+    padding: 0 1.25rem;
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    border: 0.5px solid var(--border);
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+
+  .action-btn:hover { color: var(--cream); border-color: rgba(232,224,208,0.2); }
+
+  .action-btn.danger:hover { color: #c87070; border-color: rgba(200,112,112,0.3); }
+
+  /* MAIN */
+  .main {
+    padding: 2rem;
+    max-width: 900px;
+  }
+
+  /* PANELS */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* FORM */
+  .form-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .form-section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group.full { grid-column: span 2; }
+
+  label {
+    font-size: 0.58rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  input, textarea, select {
+    background: var(--bg);
+    border: 0.5px solid rgba(232,224,208,0.1);
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.55rem 0.7rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+  textarea { resize: vertical; min-height: 72px; line-height: 1.6; }
+  select option { background: #1a1714; }
+
+  /* TAGS */
+  .tags-row { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.4rem; }
+
+  .tag-pill {
+    font-size: 0.58rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.28rem 0.65rem;
+    border: 0.5px solid var(--border);
+    cursor: pointer;
+    transition: all 0.18s;
+    color: var(--muted);
+    user-select: none;
+  }
+
+  .tag-pill.selected {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  /* IMPORTANCE */
+  .imp-row { display: flex; gap: 0.4rem; margin-top: 0.4rem; }
+
+  .imp-pill {
+    flex: 1;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem;
+    border: 0.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+  }
+
+  .imp-pill.sel-strong { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .imp-pill.sel-normal { border-color: rgba(232,224,208,0.25); color: var(--cream); background: rgba(232,224,208,0.04); }
+  .imp-pill.sel-minor  { border-color: var(--muted); color: var(--muted); }
+
+  /* DESTINATIONS */
+  .dest-row { display: flex; gap: 0.4rem; margin-top: 0.4rem; flex-wrap: wrap; }
+
+  .dest-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.8rem;
+    border: 0.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+
+  .dest-pill.on-portfolio { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+  .dest-pill.on-linkedin  { border-color: var(--blue); color: var(--blue); background: var(--blue-dim); }
+  .dest-pill.on-resume    { border-color: var(--resume); color: var(--resume); background: var(--resume-dim); }
+
+  /* SUBMIT */
+  .btn-submit {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.7rem 2rem;
+    border: 0.5px solid var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 1rem;
+  }
+
+  .btn-submit:hover { background: rgba(200,146,42,0.22); }
+
+  /* ENTRIES */
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .filter-row { display: flex; gap: 0.35rem; }
+
+  .filter-btn {
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.28rem 0.6rem;
+    border: 0.5px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    transition: all 0.18s;
+  }
+
+  .filter-btn.active { border-color: rgba(232,224,208,0.3); color: var(--cream); }
+
+  /* ENTRY CARD */
+  .entry-card {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.5rem;
+    transition: border-color 0.2s;
+  }
+
+  .entry-card:hover { border-color: rgba(232,224,208,0.15); }
+
+  .entry-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+  }
+
+  .entry-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--cream);
+  }
+
+  .entry-del {
+    font-size: 0.58rem;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    transition: color 0.2s;
+    padding: 0.1rem 0.3rem;
+    letter-spacing: 0.05em;
+  }
+
+  .entry-del:hover { color: #c87070; }
+
+  .entry-meta {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+    align-items: center;
+  }
+
+  .entry-year { font-size: 0.6rem; color: var(--accent); letter-spacing: 0.08em; }
+
+  .meta-badge {
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.18rem 0.5rem;
+    border: 0.5px solid var(--border);
+    color: var(--muted);
+  }
+
+  .meta-badge.strong { background: var(--accent-dim); color: var(--accent); border-color: rgba(200,146,42,0.25); }
+  .meta-badge.normal { background: rgba(232,224,208,0.04); color: var(--cream); border-color: rgba(232,224,208,0.15); }
+  .meta-badge.assets { background: var(--green-dim); color: var(--green); border-color: rgba(74,124,89,0.3); }
+
+  .entry-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.5rem; }
+
+  .entry-bottom { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; }
+
+  .dest-tag {
+    font-size: 0.55rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.18rem 0.5rem;
+  }
+
+  .dest-tag.portfolio { background: var(--green-dim); color: #6aac89; border: 0.5px solid rgba(74,124,89,0.3); }
+  .dest-tag.linkedin  { background: var(--blue-dim); color: #6a8acc; border: 0.5px solid rgba(74,106,156,0.3); }
+  .dest-tag.resume    { background: var(--resume-dim); color: #b07acc; border: 0.5px solid rgba(124,74,140,0.3); }
+
+  .entry-tools { font-size: 0.6rem; color: var(--muted); }
+
+  /* EMPTY */
+  .empty {
+    text-align: center;
+    padding: 3rem;
+    color: var(--muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    border: 0.5px dashed var(--border);
+  }
+
+  /* OUTPUT VIEWS */
+  .output-entry {
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    padding: 1.25rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .output-tag { font-size: 0.6rem; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.3rem; }
+  .output-title { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+  .output-body { font-size: 0.7rem; color: var(--muted); line-height: 1.8; }
+  .output-tools { font-size: 0.6rem; color: rgba(200,146,42,0.6); margin-top: 0.5rem; }
+  .output-bullets { font-size: 0.7rem; color: var(--muted); line-height: 2; padding-left: 1rem; border-left: 0.5px solid var(--border); }
+
+  /* RESUME VIEW */
+  .resume-section { margin-bottom: 1.5rem; }
+  .resume-section-title {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 0.5px solid var(--border);
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--surface2); }
+
+  /* RESPONSIVE */
+  @media (max-width: 700px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; border-right: none; border-bottom: 0.5px solid var(--border); padding: 1rem 0; }
+    .main { padding: 1.25rem; }
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: span 1; }
+    .stats { gap: 1rem; }
+    .topbar { padding: 0.75rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-name">Experience<span>Tracker</span></div>
+    <div class="brand-sub">Portfolio · LinkedIn · Resume Builder</div>
+  </div>
+  <div class="stats">
+    <div class="stat-item">
+      <span class="stat-num" id="total-count">0</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" id="portfolio-count">0</span>
+      <span class="stat-label">Portfolio</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" id="linkedin-count">0</span>
+      <span class="stat-label">LinkedIn</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" id="resume-count">0</span>
+      <span class="stat-label">Resume</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Add</div>
+      <button class="nav-btn active" onclick="showPanel('add', this)">
+        <span class="nav-dot"></span> New Entry
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">View</div>
+      <button class="nav-btn" onclick="showPanel('all', this)">
+        <span class="nav-dot"></span> All Entries
+      </button>
+      <button class="nav-btn" onclick="showPanel('portfolio', this)">
+        <span class="nav-dot"></span> Portfolio View
+      </button>
+      <button class="nav-btn" onclick="showPanel('linkedin', this)">
+        <span class="nav-dot"></span> LinkedIn View
+      </button>
+      <button class="nav-btn" onclick="showPanel('resume', this)">
+        <span class="nav-dot"></span> Resume View
+      </button>
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <div class="sidebar-actions">
+      <div class="sidebar-label" style="margin-bottom:0.75rem;">Export</div>
+      <button class="action-btn" onclick="exportJSON()">Export JSON</button>
+      <button class="action-btn" onclick="exportText()">Export as Text</button>
+      <button class="action-btn" onclick="importJSON()">Import JSON</button>
+      <hr class="sidebar-divider" style="margin: 0.75rem 0;">
+      <button class="action-btn danger" onclick="clearAll()">Clear All Data</button>
+    </div>
+
+    <div style="padding: 1.5rem 1.25rem 0; font-size: 0.55rem; color: var(--muted); line-height: 1.7; letter-spacing: 0.05em;">
+      Data is saved locally in your browser. Export regularly to back up.
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ADD PANEL -->
+    <div class="panel active" id="panel-add">
+      <div class="form-card">
+        <div class="form-section-title">New Entry</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Title / Project Name *</label>
+            <input type="text" id="f-name" placeholder="e.g. Short Film, Hackathon, Internship...">
+          </div>
+          <div class="form-group">
+            <label>Year</label>
+            <input type="text" id="f-year" placeholder="e.g. 2024, 2023–2024">
+          </div>
+          <div class="form-group full">
+            <label>One-line summary</label>
+            <input type="text" id="f-oneline" placeholder="What did you do? One clear sentence.">
+          </div>
+          <div class="form-group full">
+            <label>Details (optional)</label>
+            <textarea id="f-detail" placeholder="Expand on your role, the context, what you learned, measurable results..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>Tools / Technologies</label>
+            <input type="text" id="f-tools" placeholder="e.g. Figma, Python, DaVinci Resolve">
+          </div>
+          <div class="form-group">
+            <label>Do you have assets?</label>
+            <select id="f-assets">
+              <option value="">— Select —</option>
+              <option value="yes-ready">Yes, ready to use</option>
+              <option value="yes-find">Yes, need to find them</option>
+              <option value="no">No assets</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Link (optional)</label>
+            <input type="text" id="f-link" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>Role</label>
+            <input type="text" id="f-role" placeholder="e.g. Director, Developer, Designer">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label>Category</label>
+          <div class="tags-row" id="type-tags">
+            <span class="tag-pill" data-val="Personal Project">Personal Project</span>
+            <span class="tag-pill" data-val="University Project">University Project</span>
+            <span class="tag-pill" data-val="Competition">Competition</span>
+            <span class="tag-pill" data-val="Internship">Internship</span>
+            <span class="tag-pill" data-val="Freelance">Freelance</span>
+            <span class="tag-pill" data-val="Event / Workshop">Event / Workshop</span>
+            <span class="tag-pill" data-val="Club / Society">Club / Society</span>
+            <span class="tag-pill" data-val="Content Creation">Content Creation</span>
+            <span class="tag-pill" data-val="Research">Research</span>
+            <span class="tag-pill" data-val="Volunteer">Volunteer</span>
+            <span class="tag-pill" data-val="Award">Award</span>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+          <label>Importance</label>
+          <div class="imp-row">
+            <button class="imp-pill" data-val="strong" onclick="selectImp(this)">★ Strong — Must include</button>
+            <button class="imp-pill" data-val="normal" onclick="selectImp(this)">◇ Normal — Worth including</button>
+            <button class="imp-pill" data-val="minor"  onclick="selectImp(this)">· Minor — Maybe</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Include in</label>
+          <div class="dest-row">
+            <button class="dest-pill" data-dest="portfolio" onclick="toggleDest(this)">Portfolio</button>
+            <button class="dest-pill" data-dest="linkedin"  onclick="toggleDest(this)">LinkedIn</button>
+            <button class="dest-pill" data-dest="resume"    onclick="toggleDest(this)">Resume / CV</button>
+          </div>
+        </div>
+
+        <button class="btn-submit" onclick="addEntry()">Add Entry →</button>
+      </div>
+    </div>
+
+    <!-- ALL ENTRIES PANEL -->
+    <div class="panel" id="panel-all">
+      <div class="panel-header">
+        <span class="panel-title">All Entries</span>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="filterEntries('all', this)">All</button>
+          <button class="filter-btn" onclick="filterEntries('strong', this)">Strong</button>
+          <button class="filter-btn" onclick="filterEntries('portfolio', this)">Portfolio</button>
+          <button class="filter-btn" onclick="filterEntries('linkedin', this)">LinkedIn</button>
+          <button class="filter-btn" onclick="filterEntries('resume', this)">Resume</button>
+        </div>
+      </div>
+      <div id="entries-list"></div>
+    </div>
+
+    <!-- PORTFOLIO VIEW -->
+    <div class="panel" id="panel-portfolio">
+      <div class="panel-header">
+        <span class="panel-title">Portfolio — Selected Projects</span>
+      </div>
+      <div id="portfolio-list"></div>
+    </div>
+
+    <!-- LINKEDIN VIEW -->
+    <div class="panel" id="panel-linkedin">
+      <div class="panel-header">
+        <span class="panel-title">LinkedIn — Experience & Projects</span>
+      </div>
+      <div id="linkedin-list"></div>
+    </div>
+
+    <!-- RESUME VIEW -->
+    <div class="panel" id="panel-resume">
+      <div class="panel-header">
+        <span class="panel-title">Resume / CV — Ready to Copy</span>
+      </div>
+      <div id="resume-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<input type="file" id="import-input" accept=".json" style="display:none" onchange="handleImport(event)">
+
+<script>
+  const STORAGE_KEY = 'experiencetracker_v1';
+  let entries = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  let selectedType = '';
+  let selectedImp = '';
+  let selectedDests = [];
+  let currentFilter = 'all';
+
+  // Tag selection
+  document.querySelectorAll('.tag-pill').forEach(tag => {
+    tag.addEventListener('click', () => {
+      document.querySelectorAll('.tag-pill').forEach(t => t.classList.remove('selected'));
+      tag.classList.add('selected');
+      selectedType = tag.dataset.val;
+    });
+  });
+
+  function selectImp(btn) {
+    document.querySelectorAll('.imp-pill').forEach(b => b.className = 'imp-pill');
+    btn.classList.add('sel-' + btn.dataset.val);
+    selectedImp = btn.dataset.val;
+  }
+
+  function toggleDest(btn) {
+    const dest = btn.dataset.dest;
+    const cls = 'on-' + dest;
+    if (btn.classList.contains(cls)) {
+      btn.classList.remove(cls);
+      selectedDests = selectedDests.filter(d => d !== dest);
+    } else {
+      btn.classList.add(cls);
+      selectedDests.push(dest);
+    }
+  }
+
+  function addEntry() {
+    const name = document.getElementById('f-name').value.trim();
+    if (!name) { alert('Please enter a title.'); return; }
+
+    const entry = {
+      id: Date.now(),
+      name,
+      year:      document.getElementById('f-year').value.trim(),
+      oneline:   document.getElementById('f-oneline').value.trim(),
+      detail:    document.getElementById('f-detail').value.trim(),
+      tools:     document.getElementById('f-tools').value.trim(),
+      link:      document.getElementById('f-link').value.trim(),
+      role:      document.getElementById('f-role').value.trim(),
+      assets:    document.getElementById('f-assets').value,
+      type:      selectedType,
+      importance: selectedImp || 'normal',
+      destinations: [...selectedDests],
+    };
+
+    entries.unshift(entry);
+    save();
+    resetForm();
+    updateStats();
+    renderAll();
+    showPanel('all', document.querySelectorAll('.nav-btn')[1]);
+  }
+
+  function resetForm() {
+    ['f-name','f-year','f-oneline','f-detail','f-tools','f-link','f-role'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('f-assets').value = '';
+    document.querySelectorAll('.tag-pill').forEach(t => t.classList.remove('selected'));
+    document.querySelectorAll('.imp-pill').forEach(b => b.className = 'imp-pill');
+    document.querySelectorAll('.dest-pill').forEach(b => {
+      b.className = 'dest-pill';
+    });
+    selectedType = ''; selectedImp = ''; selectedDests = [];
+  }
+
+  function deleteEntry(id) {
+    if (!confirm('Remove this entry?')) return;
+    entries = entries.filter(e => e.id !== id);
+    save();
+    updateStats();
+    renderAll();
+  }
+
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
+
+  function updateStats() {
+    document.getElementById('total-count').textContent = entries.length;
+    document.getElementById('portfolio-count').textContent = entries.filter(e => e.destinations.includes('portfolio')).length;
+    document.getElementById('linkedin-count').textContent = entries.filter(e => e.destinations.includes('linkedin')).length;
+    document.getElementById('resume-count').textContent = entries.filter(e => e.destinations.includes('resume')).length;
+  }
+
+  function showPanel(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (id === 'all') renderEntries(currentFilter);
+    if (id === 'portfolio') renderPortfolio();
+    if (id === 'linkedin') renderLinkedIn();
+    if (id === 'resume') renderResume();
+  }
+
+  function filterEntries(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderEntries(f);
+  }
+
+  function impLabel(imp) {
+    if (imp === 'strong') return '★ Strong';
+    if (imp === 'normal') return '◇ Normal';
+    return '· Minor';
+  }
+
+  function renderEntries(filter) {
+    const list = document.getElementById('entries-list');
+    let filtered = entries;
+    if (filter === 'strong')    filtered = entries.filter(e => e.importance === 'strong');
+    if (filter === 'portfolio') filtered = entries.filter(e => e.destinations.includes('portfolio'));
+    if (filter === 'linkedin')  filtered = entries.filter(e => e.destinations.includes('linkedin'));
+    if (filter === 'resume')    filtered = entries.filter(e => e.destinations.includes('resume'));
+
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="empty">No entries here yet.</div>';
+      return;
+    }
+
+    list.innerHTML = filtered.map(e => `
+      <div class="entry-card">
+        <div class="entry-top">
+          <div class="entry-name">${e.name}</div>
+          <button class="entry-del" onclick="deleteEntry(${e.id})">remove</button>
+        </div>
+        <div class="entry-meta">
+          ${e.year ? `<span class="entry-year">${e.year}</span>` : ''}
+          ${e.type ? `<span class="meta-badge">${e.type}</span>` : ''}
+          ${e.role ? `<span class="meta-badge">${e.role}</span>` : ''}
+          <span class="meta-badge ${e.importance === 'strong' ? 'strong' : e.importance === 'normal' ? 'normal' : ''}">${impLabel(e.importance)}</span>
+          ${e.assets === 'yes-ready' ? '<span class="meta-badge assets">Assets ✓</span>' : e.assets === 'yes-find' ? '<span class="meta-badge">Assets (find)</span>' : ''}
+        </div>
+        ${e.oneline ? `<div class="entry-desc">${e.oneline}</div>` : ''}
+        <div class="entry-bottom">
+          ${e.destinations.includes('portfolio') ? '<span class="dest-tag portfolio">Portfolio</span>' : ''}
+          ${e.destinations.includes('linkedin')  ? '<span class="dest-tag linkedin">LinkedIn</span>'  : ''}
+          ${e.destinations.includes('resume')    ? '<span class="dest-tag resume">Resume</span>'      : ''}
+          ${e.tools ? `<span class="entry-tools">· ${e.tools}</span>` : ''}
+          ${e.link  ? `<a href="${e.link}" target="_blank" style="font-size:0.6rem;color:var(--accent);text-decoration:none;margin-left:0.5rem;">↗ Link</a>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderPortfolio() {
+    const list = document.getElementById('portfolio-list');
+    const filtered = entries.filter(e => e.destinations.includes('portfolio'));
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="empty">No entries marked for Portfolio yet.</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(e => `
+      <div class="output-entry">
+        <div class="output-tag">${e.type || 'Project'}${e.year ? ' · ' + e.year : ''}${e.role ? ' · ' + e.role : ''}</div>
+        <div class="output-title">${e.name}</div>
+        <div class="output-body">${e.oneline || ''}${e.detail ? '<br><br>' + e.detail : ''}</div>
+        ${e.tools ? `<div class="output-tools">Tools: ${e.tools}</div>` : ''}
+        ${e.link  ? `<div style="margin-top:0.5rem;"><a href="${e.link}" target="_blank" style="font-size:0.6rem;color:var(--accent);text-decoration:none;">↗ ${e.link}</a></div>` : ''}
+      </div>
+    `).join('');
+  }
+
+  function renderLinkedIn() {
+    const list = document.getElementById('linkedin-list');
+    const filtered = entries.filter(e => e.destinations.includes('linkedin'));
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="empty">No entries marked for LinkedIn yet.</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(e => {
+      const bullets = [];
+      if (e.role)    bullets.push(`Role: ${e.role}`);
+      if (e.oneline) bullets.push(e.oneline);
+      if (e.detail)  bullets.push(e.detail);
+      if (e.tools)   bullets.push(`Tools: ${e.tools}`);
+      return `
+        <div class="output-entry">
+          <div class="output-tag">${e.type || 'Experience'}${e.year ? ' · ' + e.year : ''}</div>
+          <div class="output-title">${e.name}</div>
+          <div class="output-bullets">${bullets.map(b => `• ${b}`).join('<br>')}</div>
+          ${e.link ? `<div style="margin-top:0.75rem;"><a href="${e.link}" target="_blank" style="font-size:0.6rem;color:var(--accent);text-decoration:none;">↗ ${e.link}</a></div>` : ''}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderResume() {
+    const list = document.getElementById('resume-list');
+    const filtered = entries.filter(e => e.destinations.includes('resume'));
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="empty">No entries marked for Resume yet.</div>';
+      return;
+    }
+
+    const grouped = {};
+    filtered.forEach(e => {
+      const key = e.type || 'Other';
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(e);
+    });
+
+    list.innerHTML = Object.entries(grouped).map(([type, items]) => `
+      <div class="resume-section">
+        <div class="resume-section-title">${type}</div>
+        ${items.map(e => `
+          <div class="output-entry">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.3rem;">
+              <div class="output-title">${e.name}</div>
+              ${e.year ? `<span style="font-size:0.6rem;color:var(--muted);">${e.year}</span>` : ''}
+            </div>
+            ${e.role ? `<div style="font-size:0.62rem;color:var(--accent);margin-bottom:0.4rem;letter-spacing:0.06em;">${e.role}</div>` : ''}
+            ${e.oneline ? `<div class="output-body">• ${e.oneline}</div>` : ''}
+            ${e.detail  ? `<div class="output-body">• ${e.detail}</div>`  : ''}
+            ${e.tools   ? `<div class="output-tools" style="margin-top:0.4rem;">Skills: ${e.tools}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    `).join('');
+  }
+
+  function renderAll() {
+    renderEntries(currentFilter);
+    renderPortfolio();
+    renderLinkedIn();
+    renderResume();
+  }
+
+  // EXPORT / IMPORT
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'experience-tracker-backup.json';
+    a.click();
+  }
+
+  function exportText() {
+    const lines = entries.map(e =>
+      `[${e.importance.toUpperCase()}] ${e.name} (${e.year || '—'})\n` +
+      `Category: ${e.type || '—'} | Role: ${e.role || '—'}\n` +
+      `${e.oneline || ''}\n` +
+      `Tools: ${e.tools || '—'}\n` +
+      `Destinations: ${e.destinations.join(', ') || '—'}\n` +
+      `Link: ${e.link || '—'}\n`
+    ).join('\n---\n\n');
+    const blob = new Blob([lines], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'experience-tracker-export.txt';
+    a.click();
+  }
+
+  function importJSON() {
+    document.getElementById('import-input').click();
+  }
+
+  function handleImport(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const imported = JSON.parse(e.target.result);
+        if (!Array.isArray(imported)) throw new Error();
+        if (confirm(`Import ${imported.length} entries? This will merge with your existing data.`)) {
+          const existingIds = new Set(entries.map(e => e.id));
+          const newEntries = imported.filter(e => !existingIds.has(e.id));
+          entries = [...newEntries, ...entries];
+          save();
+          updateStats();
+          renderAll();
+          alert(`Imported ${newEntries.length} new entries.`);
+        }
+      } catch {
+        alert('Invalid file. Please use a JSON file exported from ExperienceTracker.');
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  function clearAll() {
+    if (confirm('Clear ALL entries? This cannot be undone.')) {
+      entries = [];
+      save();
+      updateStats();
+      renderAll();
+    }
+  }
+
+  // Init
+  updateStats();
+  renderAll();
+</script>
+</body>
+</html>
