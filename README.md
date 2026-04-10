@@ -4,7 +4,7 @@
 
 No account. No subscription. No data sent anywhere. Everything stays in your browser.
 
-🔗 **Live demo:** [your-github-username.github.io/experience-tracker](https://github.com)
+🔗 **Live demo:** https://fangorr.github.io/experience-tracker/ (https://github.com)
 
 ---
 
